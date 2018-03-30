@@ -1,0 +1,15 @@
+{
+  "name": "zealot/dataframe",
+  "description": "lightweight lib to find/read/write files/csv files",
+  "homepage": "https://github.com/sturkin/filesystem",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.0.0",
+    "zealot/filesystem": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Zealot\\DataFrame\\": "src/"
+    }
+  }
+}
