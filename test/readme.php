@@ -10,18 +10,19 @@ $files_data = [
         'type' => 'file',
         'name' => 'csvfile_emails.csv',
         'data' => [
-            ['email','name'],
-            ['sturkin30@gmail.com','sergey'],
-            ['sturkin@gmail.com',''],
-        ]
+            ['email', 'name'],
+            ['sturkin30@gmail.com', 'sergey'],
+            ['sturkin@gmail.com', ''],
+        ],
     ],
 ];
 
-function createFiles($files_data,$tmpDir) {
-    foreach($files_data as $elem) {
+function createFiles($files_data, $tmpDir)
+{
+    foreach ($files_data as $elem) {
         $fileName = $tmpDir.DIRECTORY_SEPARATOR.$elem['name'];
-        if($elem['type'] == 'file') {
-            $writer = new Csv\Writer($fileName,'w+');
+        if ($elem['type'] == 'file') {
+            $writer = new Csv\Writer($fileName, 'w+');
             foreach ($elem['data'] as $line) {
                 $writer->addRow($line);
             }
@@ -31,15 +32,15 @@ function createFiles($files_data,$tmpDir) {
     }
 }
 
-function deleteFiles($files_data,$tmpDir) {
-    foreach($files_data as $elem) {
-        $fileName = $tmpDir . DIRECTORY_SEPARATOR . $elem['name'];
+function deleteFiles($files_data, $tmpDir)
+{
+    foreach ($files_data as $elem) {
+        $fileName = $tmpDir.DIRECTORY_SEPARATOR.$elem['name'];
         unlink($fileName);
     }
 }
 
-
-createFiles($files_data,$tmpDir);
+createFiles($files_data, $tmpDir);
 /**** START ****/
 //Lib to work with csv files/assoc arrays like DB table. For now implemented only whereIn.
 
@@ -57,6 +58,5 @@ foreach ($filteredDF->getAssocArrayIterator() as $line) {
 
 //$utils->toCsvFile($filteredDF,'path to file')
 
-
 /*** END ***/
-deleteFiles($files_data,$tmpDir);
+deleteFiles($files_data, $tmpDir);

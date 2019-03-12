@@ -2,7 +2,6 @@
 
 namespace Zealot\DataFrame\Column;
 
-
 class FixedArray extends AbstractColumn
 {
     private $array = null;
@@ -14,31 +13,37 @@ class FixedArray extends AbstractColumn
     {
         parent::__construct($name);
         $this->array = new \SplFixedArray($this->maxSize);
-
     }
 
-    public function count() {
+    public function count()
+    {
         return $this->getCurentSize();
     }
-    public function add($value) {
+
+    public function add($value)
+    {
         $this->checkSize();
         $this->array[$this->position] = $value;
         $this->position++;
         $this->incrementCurrentSize();
     }
-    public function get($index) {
+
+    public function get($index)
+    {
         return $this->array[$index];
     }
 
-    protected function checkSize() {
+    protected function checkSize()
+    {
         if ($this->curentSize == $this->maxSize) {
-            $newSize = $this->maxSize*2+1;
+            $newSize = $this->maxSize * 2 + 1;
             $this->array->setSize($newSize);
             $this->maxSize = $newSize;
         }
     }
 
-    protected function incrementCurrentSize() {
+    protected function incrementCurrentSize()
+    {
         $this->curentSize++;
     }
 
@@ -47,6 +52,7 @@ class FixedArray extends AbstractColumn
     {
         return $this->curentSize;
     }
+
     protected function setCurentSize(int $curentSize)
     {
         $this->curentSize = $curentSize;
@@ -56,6 +62,7 @@ class FixedArray extends AbstractColumn
     {
         return $this->maxSize;
     }
+
     protected function setMaxSize(int $maxSize)
     {
         $this->maxSize = $maxSize;
@@ -65,6 +72,7 @@ class FixedArray extends AbstractColumn
     {
         return $this->array;
     }
+
     protected function setArray(\SplFixedArray $array)
     {
         $this->array = $array;
@@ -74,10 +82,11 @@ class FixedArray extends AbstractColumn
     {
         return $this->position;
     }
+
     public function setPosition(int $position)
     {
         $this->position = $position;
     }
-    // END GETTERS/SETTERS //
 
+    // END GETTERS/SETTERS //
 }

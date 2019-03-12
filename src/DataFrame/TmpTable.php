@@ -10,15 +10,16 @@ class TmpTable extends AbstractDataFrame
 
     protected function createColumn($name)
     {
-        $col = new Column\TmpTable($name,$this->dir);
+        $col = new Column\TmpTable($name, $this->dir);
+
         return $col;
     }
 
-    public function getColumnIterator($name) {
+    public function getColumnIterator($name)
+    {
         $id = $this->columnNameToId($name);
         $columns = $this->getColumns();
 
         return new Column\Iterator($columns[$id]);
     }
-
 }

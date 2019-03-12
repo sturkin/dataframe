@@ -3,21 +3,17 @@
  * Created by PhpStorm.
  * User: sturkin30
  * Date: 11.04.18
- * Time: 18:10
+ * Time: 18:10.
  */
 
 namespace Zealot\DataFrame;
 
-use Zealot\DataFrame\Interfaces;
-use Zealot\DataFrame\DataFrameFactories;
 use Zealot\Filesystem\Csv\Reader;
 use Zealot\Filesystem\Csv\Writer;
-
 
 class IOUtils
 {
     private $factory = null;
-
 
     public function __construct($factory = null)
     {
@@ -29,7 +25,7 @@ class IOUtils
 
     public function fromArray(array $array): Interfaces\DataFrame
     {
-        if (empty($array) || empty($array[0]) || !is_array($array[0]) ) {
+        if (empty($array) || empty($array[0]) || !is_array($array[0])) {
             throw new Exception('Invalid array');
         }
         $columnNames = array_keys($array[0]);
@@ -41,29 +37,34 @@ class IOUtils
         return $dataFrame;
     }
 
-    public function fromCsvFile($file, $limit = 0, $delimiter=',',$enclosure='"',$escape="\\"): Interfaces\DataFrame
+    public function fromCsvFile($file, $limit = 0, $delimiter = ',', $enclosure = '"', $escape = '\\'): Interfaces\DataFrame
     {
-        $reader = new Reader($file,$delimiter,$enclosure,$escape);
+        $reader = new Reader($file, $delimiter, $enclosure, $escape);
         $columnNames = $reader->header();
         $dataFrame = $this->getFactory()->buildDataFrame($columnNames);
         $i = 0;
         foreach ($reader as $line) {
             $dataFrame->addLine($line);
             $i++;
-            if(!empty($limit) && $i === $limit) break;
+            if (!empty($limit) && $i === $limit) {
+                break;
+            }
         }
+
         return $dataFrame;
     }
 
-    public function toCsvFile(Interfaces\DataFrame $df, string $path, int $limit = 0, $delimiter=',',$enclosure='"',$escape="\\")
+    public function toCsvFile(Interfaces\DataFrame $df, string $path, int $limit = 0, $delimiter = ',', $enclosure = '"', $escape = '\\')
     {
-        $writer = new Writer($path,'w+',$delimiter,$enclosure,$escape);
+        $writer = new Writer($path, 'w+', $delimiter, $enclosure, $escape);
         $iterator = $df->getCsvArrayIterator();
         $i = 0;
         foreach ($iterator as $line) {
             $writer->addRow($line);
             $i++;
-            if(!empty($limit) && $i === $limit) break;
+            if (!empty($limit) && $i === $limit) {
+                break;
+            }
         }
     }
 
@@ -75,7 +76,9 @@ class IOUtils
         foreach ($iterator as $line) {
             $data[] = $line;
             $i++;
-            if(!empty($limit) && $i === $limit) break;
+            if (!empty($limit) && $i === $limit) {
+                break;
+            }
         }
 
         return $data;
@@ -86,10 +89,11 @@ class IOUtils
     {
         return $this->factory;
     }
+
     protected function setFactory(Interfaces\DataFrameFactory $factory)
     {
         $this->factory = $factory;
     }
-    // END GETTERS/SETTERS //
 
+    // END GETTERS/SETTERS //
 }
