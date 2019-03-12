@@ -3,22 +3,20 @@
  * Created by PhpStorm.
  * User: sturkin30
  * Date: 14.04.18
- * Time: 21:46
+ * Time: 21:46.
  */
 
 namespace Zealot\DataFrame\Column;
 
 use Zealot\DataFrame\Exception;
-use Zealot\DataFrame\Interfaces\Column;
 use Zealot\Filesystem\File;
-
 
 //TODO: move read/write buffes to separate objs
 class TmpTable extends AbstractColumn
 {
-    CONST LINE_BREAK_ESCAPE_CHARS = "#!\\n@!#";
-    CONST BUFFER_SIZE = 1024*1024*64;
-    CONST READ_BUFFER_SIZE = 1024*1024;
+    const LINE_BREAK_ESCAPE_CHARS = '#!\\n@!#';
+    const BUFFER_SIZE = 1024 * 1024 * 64;
+    const READ_BUFFER_SIZE = 1024 * 1024;
 
     private $dir = null;
     private $fileObj = null;
@@ -31,8 +29,6 @@ class TmpTable extends AbstractColumn
     private $readBufferStartPosition = 0;
     private $readBufferLength = 0;
 
-
-
     //TODO: change $dir from str to some obj
     public function __construct($name, $dir = '/tmp/')
     {
@@ -41,15 +37,20 @@ class TmpTable extends AbstractColumn
         $this->initFileObj();
     }
 
-    public function count() {
+    public function count()
+    {
         return $this->getSize();
     }
-    public function add($value) {
+
+    public function add($value)
+    {
         //$value = str_replace(PHP_EOL, static::LINE_BREAK_ESCAPE_CHARS, $value);
-        $this->bufferAdd($value . PHP_EOL);
+        $this->bufferAdd($value.PHP_EOL);
         $this->incrementSize();
     }
-    public function get($index) {
+
+    public function get($index)
+    {
         $this->flushBuffer();
 
         $value = $this->getFromReadBuffer($index);
@@ -64,33 +65,35 @@ class TmpTable extends AbstractColumn
     }
 
     // read buffer start
-    protected function getFromReadBuffer($index) {
-        if(!$this->isIndexExistsInReadBuffer($index)) {
+    protected function getFromReadBuffer($index)
+    {
+        if (!$this->isIndexExistsInReadBuffer($index)) {
             $this->reFillReadBuffer($index);
         }
         $buffer = $this->getReadBuffer();
-        return $buffer[$index-$this->getReadBufferStartPosition()];
+
+        return $buffer[$index - $this->getReadBufferStartPosition()];
     }
 
-    protected function reFillReadBuffer($index) {
-
+    protected function reFillReadBuffer($index)
+    {
         $file = $this->getFileObj();
         $file->seek($index);
         $str = $file->read(static::READ_BUFFER_SIZE);
         $buffer = explode(PHP_EOL, $str);
         $bufferCount = 10000;
         if (!$file->isEnd()) {
-            $buffer = array_slice($buffer,0,$bufferCount);
+            $buffer = array_slice($buffer, 0, $bufferCount);
         }
 
         $this->setReadBuffer($buffer);
         $this->setReadBufferLength($bufferCount);
         $this->setReadBufferStartPosition($index);
         unset($buffer);
-
     }
 
-    protected function isIndexExistsInReadBuffer($index) {
+    protected function isIndexExistsInReadBuffer($index)
+    {
         $res = false;
         $buffer = $this->getReadBuffer();
         $minBufferIndex = $this->getReadBufferStartPosition();
@@ -101,23 +104,25 @@ class TmpTable extends AbstractColumn
 
         return $res;
     }
+
     // read buffer start
 
-
-
     // write buffer start
-    protected function bufferAdd($value) {
+    protected function bufferAdd($value)
+    {
         $this->buffer .= $value;
         $this->checkBuffer();
     }
 
-    protected function checkBuffer() {
-        if (($this->getSize()-$this->getBufferPosition()) > 100 && strlen($this->getBuffer()) >= static::BUFFER_SIZE) {
+    protected function checkBuffer()
+    {
+        if (($this->getSize() - $this->getBufferPosition()) > 100 && strlen($this->getBuffer()) >= static::BUFFER_SIZE) {
             $this->flushBuffer();
         }
     }
 
-    public function flushBuffer() {
+    public function flushBuffer()
+    {
         $buffer = $this->getBuffer();
         if (!empty($buffer)) {
             $file = $this->getFileObj();
@@ -129,18 +134,20 @@ class TmpTable extends AbstractColumn
             $this->setBuffer($buffer);
         }
     }
+
     // write buffer end
 
-
-    protected function initFileObj() {
+    protected function initFileObj()
+    {
         $name = $this->getName();
         $dir = $this->getDir();
-        $tmpFilePath = $dir . $name . '_' . time() . rand(1,100) . microtime() . '.csv';
+        $tmpFilePath = $dir.$name.'_'.time().rand(1, 100).microtime().'.csv';
 
-        $this->setFileObj(new File($tmpFilePath,'w+'));
+        $this->setFileObj(new File($tmpFilePath, 'w+'));
     }
 
-    protected function destroyFileObj() {
+    protected function destroyFileObj()
+    {
         $filePath = $this->fileObj->getRealPath();
         $this->fileObj = null;
         unlink($filePath);
@@ -151,10 +158,11 @@ class TmpTable extends AbstractColumn
     {
         return $this->dir;
     }
+
     //TODO: add dir slashes normalization
     protected function setDir($dir)
     {
-        if(!file_exists($dir)) {
+        if (!file_exists($dir)) {
             throw new Exception('dir is not exists');
         }
         $this->dir = $dir;
@@ -164,6 +172,7 @@ class TmpTable extends AbstractColumn
     {
         return $this->fileObj;
     }
+
     protected function setFileObj(File $fileObj)
     {
         $this->fileObj = $fileObj;
@@ -173,11 +182,14 @@ class TmpTable extends AbstractColumn
     {
         return $this->size;
     }
+
     protected function setSize(int $size)
     {
         $this->size = $size;
     }
-    protected function incrementSize() {
+
+    protected function incrementSize()
+    {
         $this->size++;
     }
 
@@ -185,6 +197,7 @@ class TmpTable extends AbstractColumn
     {
         return $this->buffer;
     }
+
     protected function setBuffer(string $buffer)
     {
         $this->buffer = $buffer;
@@ -194,6 +207,7 @@ class TmpTable extends AbstractColumn
     {
         return $this->bufferPosition;
     }
+
     protected function setBufferPosition(int $bufferPosition)
     {
         $this->bufferPosition = $bufferPosition;
@@ -203,6 +217,7 @@ class TmpTable extends AbstractColumn
     {
         return $this->readBuffer;
     }
+
     public function setReadBuffer(array $readBuffer)
     {
         $this->readBuffer = $readBuffer;
@@ -212,6 +227,7 @@ class TmpTable extends AbstractColumn
     {
         return $this->readBufferStartPosition;
     }
+
     public function setReadBufferStartPosition(int $readBufferStartPosition)
     {
         $this->readBufferStartPosition = $readBufferStartPosition;
@@ -221,10 +237,11 @@ class TmpTable extends AbstractColumn
     {
         return $this->readBufferLength;
     }
+
     public function setReadBufferLength(int $readBufferLength)
     {
         $this->readBufferLength = $readBufferLength;
     }
-    // END GETTERS/SETTERS //
 
+    // END GETTERS/SETTERS //
 }
